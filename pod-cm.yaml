@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-cm
+  namespace: default
+  labels:
+    app: myapp
+    tier: frontend
+  annotations:
+    deven.com/created-by: "cluster admin"
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    imagePullPolicy: IfNotPresent
+    ports:
+    - name: http
+      containerPort: 80
+    - name: https
+      containerPort: 443
+    volumeMounts:
+    - name: configmap
+      mountPath: /etc/nginx/config.d/
+    env:
+      - name: NGINX_SERVER_PORT
+        valueFrom:
+          configMapKeyRef:
+            name: nginx-config
+            key: nginx_port
+  volumes:
+  - name: configmap
+    configMap:
+      name: nginx-config
